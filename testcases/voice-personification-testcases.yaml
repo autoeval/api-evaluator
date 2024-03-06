@@ -1,0 +1,44 @@
+- id: TC1
+  name: Detect Isolated AI voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: file
+            path: /D:/Hackathon_2024/ai1.mp3
+            content-type: application/octet-stream
+  checks:
+    - condition: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability > 0.8
+      score:
+        passed: 10
+        failed: 0
+- id: TC2
+  name: Detect Isolated human voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: file
+            path: /D:/Hackathon_2024/human1.mp3
+            content-type: application/octet-stream
+  checks:
+    - condition: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability > 0.8
+      score:
+        passed: 10
+        failed: 0

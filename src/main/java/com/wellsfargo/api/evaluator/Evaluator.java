@@ -10,29 +10,32 @@ import com.wellsfargo.api.evaluator.model.TestCase;
 import com.wellsfargo.api.evaluator.model.TestCaseScore;
 import com.wellsfargo.api.evaluator.model.http.HttpRequest;
 import okhttp3.*;
+import org.apache.commons.lang.text.StrSubstitutor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.DoubleAdder;
 
 public class Evaluator {
 
-    public List<TestCaseScore> evaluate(final String testCaseFile) {
-        List<TestCase> testCases = parseTestCases(testCaseFile);
+    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders) {
+        List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         final OkHttpClient client = new OkHttpClient().newBuilder().build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
         testCases.forEach(testCase -> testCaseScores.add(executeTest(client, testCase)));
         return testCaseScores;
     }
-    private List<TestCase> parseTestCases(final String testCaseFile) {
+    private List<TestCase> parseTestCases(final String testCaseFile, Map<String, String> placeHolders) {
         try {
+            String yamlStr = Files.readString(Path.of(testCaseFile));
+            StrSubstitutor sub = new StrSubstitutor(placeHolders, "${", "}");
+            String result = sub.replace(yamlStr);
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.findAndRegisterModules();
-            return mapper.readValue(new File(testCaseFile), new TypeReference<>() {
+            return mapper.readValue(result, new TypeReference<>() {
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,20 +58,26 @@ public class Evaluator {
             RequestBody body;
             if(!Objects.isNull(request.getMultipart())) {
                 MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-                request.getMultipart().getFiles().forEach(filePart -> multipartBodyBuilder.addFormDataPart(filePart.getParamName(), filePart.getPath(),
-                        RequestBody.create(MediaType.parse(filePart.getContentType()),
-                                new File(filePart.getPath()))));
-                request.getMultipart().getFields().forEach(field -> {
-                    multipartBodyBuilder.addFormDataPart(field.getName(), field.getValue());
-                });
+                if(request.getMultipart().getFiles() != null) {
+                    request.getMultipart().getFiles().forEach(filePart -> multipartBodyBuilder.addFormDataPart(filePart.getParamName(), filePart.getPath(),
+                            RequestBody.create(MediaType.parse(filePart.getContentType()),
+                                    new File(filePart.getPath()))));
+                }
+                if(request.getMultipart().getFields() != null) {
+                    request.getMultipart().getFields().forEach(field -> {
+                        multipartBodyBuilder.addFormDataPart(field.getName(), field.getValue());
+                    });
+                }
                 body = multipartBodyBuilder.build();
             } else if(!Objects.isNull(request.getBody())) {
                 body = RequestBody.create(request.getBody(), MediaType.parse(bodyContentType.get()));
             } else if(!Objects.isNull(request.getForm())) {
                 FormBody.Builder formBuilder = new FormBody.Builder();
-                request.getForm().getFields().forEach(field -> {
-                    formBuilder.addEncoded(field.getName(), field.getValue());
-                });
+                if(request.getForm().getFields() != null) {
+                    request.getForm().getFields().forEach(field -> {
+                        formBuilder.addEncoded(field.getName(), field.getValue());
+                    });
+                }
                 body = formBuilder.build();
             } else {
                 body = null;
@@ -79,7 +88,8 @@ public class Evaluator {
                     .method(request.getMethod(), body)
                     .build();
             final Response response = client.newCall(httpRequest).execute();
-            final DocumentContext context = JsonPath.parse(response.body().string());
+            String resTxt = response.body().string();
+            final DocumentContext context = JsonPath.parse(resTxt);
 
             testCase.getChecks().forEach(check -> doubleAdder.add(calculateScoreforCheck(context, check)));
         } catch (Exception e) {

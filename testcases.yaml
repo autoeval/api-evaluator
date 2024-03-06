@@ -1,7 +1,7 @@
 - id: TC1
   name: Detect Isolated AI voice
   http:
-    base-path: http://localhost:8080/api
+    base-path: ${BASEPATH}
     request:
       uri: /voice/analyze
       method: POST
@@ -13,7 +13,7 @@
       multipart:
         files:
           - param-name: file
-            path: /D:/Hackathon_2024/54321-35890.mp3
+            path: xxxxx.mp3
             content-type: application/octet-stream
         fields:
           - name: field1
@@ -34,7 +34,7 @@
 - id: TC2
   name: Greetings POST Test
   http:
-    base-path: http://localhost:8080/api
+    base-path: ${BASEPATH}
     request:
       uri: /post/hello
       method: POST
@@ -52,7 +52,7 @@
 - id: TC3
   name: Greetings GET Test
   http:
-    base-path: http://localhost:8080/api
+    base-path: ${BASEPATH}
     request:
       uri: /get/hello
       method: GET
