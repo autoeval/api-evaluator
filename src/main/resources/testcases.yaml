@@ -1,0 +1,66 @@
+- id: TC1
+  name: Detect Isolated AI voice
+  http:
+    base-path: http://localhost:8080/api
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: file
+            path: /D:/Hackathon_2024/54321-35890.mp3
+            content-type: application/octet-stream
+        fields:
+          - name: field1
+            value: value1
+  checks:
+    - condition: $.analysis.detectedVoice == true
+      score:
+        passed: 1
+        failed: 0
+    - condition: $.analysis.voiceType == 'AI-generated'
+      score:
+        passed: 2
+        failed: 0
+    - condition: $.analysis.confidenceScore.aiProbability > 0.8
+      score:
+        passed: 7
+        failed: 0
+- id: TC2
+  name: Greetings POST Test
+  http:
+    base-path: http://localhost:8080/api
+    request:
+      uri: /post/hello
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: '{"name": "Subrata"}'
+  checks:
+    - condition: $.message == 'Hello Subrata!!'
+      score:
+        passed: 10
+        failed: 0
+- id: TC3
+  name: Greetings GET Test
+  http:
+    base-path: http://localhost:8080/api
+    request:
+      uri: /get/hello
+      method: GET
+      headers:
+        - name: Accept
+          value: application/json
+  checks:
+    - condition: $.message == 'Hello There!!'
+      score:
+        passed: 10
+        failed: 0
