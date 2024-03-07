@@ -13,7 +13,7 @@
       multipart:
         files:
           - param-name: file
-            path: /D:/Hackathon_2024/ai1.mp3
+            path: ${TEST_IMAGE_DIRECTORY}/ai1.mp3
             content-type: application/octet-stream
   checks:
     - condition:
@@ -36,7 +36,7 @@
       multipart:
         files:
           - param-name: file
-            path: /D:/Hackathon_2024/human1.mp3
+            path: ${TEST_IMAGE_DIRECTORY}/human1.mp3
             content-type: application/octet-stream
   checks:
     - condition:

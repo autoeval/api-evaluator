@@ -11,6 +11,8 @@ import com.wellsfargo.api.evaluator.model.*;
 import com.wellsfargo.api.evaluator.model.http.HttpRequest;
 import okhttp3.*;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -20,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.DoubleAdder;
 
 public class Evaluator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Evaluator.class);
 
     public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders) {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
@@ -38,7 +41,7 @@ public class Evaluator {
             return mapper.readValue(result, new TypeReference<>() {
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -92,7 +95,7 @@ public class Evaluator {
 
             testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
         finally {
             TestCaseScore score = new TestCaseScore();
