@@ -33,7 +33,8 @@ public class Evaluator {
     }
     private List<TestCase> parseTestCases(final String testCaseFile, Map<String, String> placeHolders) {
         try {
-            String yamlStr = Files.readString(Path.of(testCaseFile));
+            File file = new File(testCaseFile);
+            String yamlStr = Files.readString(file.toPath());
             StrSubstitutor sub = new StrSubstitutor(placeHolders, "${", "}");
             String result = sub.replace(yamlStr);
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
