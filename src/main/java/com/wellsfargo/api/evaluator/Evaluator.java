@@ -1,13 +1,13 @@
 package com.wellsfargo.api.evaluator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.wellsfargo.api.evaluator.model.Check;
-import com.wellsfargo.api.evaluator.model.TestCase;
-import com.wellsfargo.api.evaluator.model.TestCaseScore;
+import com.octomix.josson.Josson;
+import com.wellsfargo.api.evaluator.model.*;
 import com.wellsfargo.api.evaluator.model.http.HttpRequest;
 import okhttp3.*;
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -88,10 +88,9 @@ public class Evaluator {
                     .method(request.getMethod(), body)
                     .build();
             final Response response = client.newCall(httpRequest).execute();
-            String resTxt = response.body().string();
-            final DocumentContext context = JsonPath.parse(resTxt);
+            final String responseText = response.body().string();
 
-            testCase.getChecks().forEach(check -> doubleAdder.add(calculateScoreforCheck(context, check)));
+            testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,16 +102,85 @@ public class Evaluator {
             return score;
         }
     }
-    private double calculateScoreforCheck(final DocumentContext context, final Check check) {
-        try {
-            List<Object> result = context.read("[?(".concat(check.getCondition()).concat(")]"));
-            if(result == null || result.isEmpty()) {
-                return check.getScore().getFailed();
-            } else {
+
+    private double executeConditionAndScore(final Check check, final String responseText) {
+        if(Objects.isNull(check.getCondition())) {
+            return check.getScore().getPassed();
+        } else if(Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
+            if(buildExecutor(check.getCondition().getExecutor()).apply(responseText)) {
                 return check.getScore().getPassed();
+            } else {
+                return check.getScore().getFailed();
             }
+        } else if(!Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
+            if(check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
+                final List<Object> jsonPathResult = computeJsonPath(responseText, check.getCondition().getExpression());
+                if(buildExecutor(check.getCondition().getExecutor()).apply(jsonPathResult)) {
+                    return check.getScore().getPassed();
+                } else {
+                    return check.getScore().getFailed();
+                }
+            } else {
+                final JsonNode node = computeJosson(responseText, check.getCondition().getExpression());
+                if(buildExecutor(check.getCondition().getExecutor()).apply(node)) {
+                    return check.getScore().getPassed();
+                } else {
+                    return check.getScore().getFailed();
+                }
+            }
+        } else if(!Objects.isNull(check.getCondition().getExpression()) && Objects.isNull(check.getCondition().getExecutor())) {
+            if(check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
+                final List<Object> jsonPathResult = computeJsonPath(responseText, check.getCondition().getExpression());
+                return calculateScoreForJsonPath(jsonPathResult, check.getScore());
+            } else {
+                final JsonNode node = computeJosson(responseText, check.getCondition().getExpression());
+                return calculateScoreForJosson(node, check.getScore());
+            }
+        } else {
+            return check.getScore().getPassed();
+        }
+    }
+
+    private List<Object> computeJsonPath(final String responseText, final String expression) {
+        try {
+            final DocumentContext context = JsonPath.parse(responseText);
+            return context.read("[?(".concat(expression).concat(")]"));
         } catch (Exception e) {
-            return check.getScore().getFailed();
+            return null;
+        }
+    }
+
+    private JsonNode computeJosson(final String responseText, final String expression) {
+        try {
+            Josson josson = Josson.fromJsonString(responseText);
+            return josson.getNode(expression);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private double calculateScoreForJsonPath(final List<Object> result, final Score score) {
+        if(result == null || result.isEmpty()) {
+            return score.getFailed();
+        } else {
+            return score.getPassed();
+        }
+    }
+
+    private double calculateScoreForJosson(final JsonNode node, final Score score) {
+        if(node == null || node.isNull() || node.isEmpty()) {
+            return score.getFailed();
+        } else {
+            return score.getPassed();
+        }
+    }
+
+    private ConditionExecutor buildExecutor(final String executorClass) {
+        try {
+            Class<?> cls = Class.forName(executorClass);
+            return (ConditionExecutor) cls.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            return new ConditionExecutor() {};
         }
     }
 }

@@ -13,21 +13,24 @@
       multipart:
         files:
           - param-name: file
-            path: xxxxx.mp3
+            path: /D:/Hackathon_2024/ai1.mp3
             content-type: application/octet-stream
         fields:
           - name: field1
             value: value1
   checks:
-    - condition: $.analysis.detectedVoice == true
+    - condition:
+        expression: $.analysis.detectedVoice == true
       score:
         passed: 1
         failed: 0
-    - condition: $.analysis.voiceType == 'AI-generated'
+    - condition:
+        expression: $.analysis.voiceType == 'AI-generated'
       score:
         passed: 2
         failed: 0
-    - condition: $.analysis.confidenceScore.aiProbability > 0.8
+    - condition:
+        expression: $.analysis.confidenceScore.aiProbability > 0.8
       score:
         passed: 7
         failed: 0
@@ -45,7 +48,8 @@
           value: application/json
       body: '{"name": "Subrata"}'
   checks:
-    - condition: $.message == 'Hello Subrata!!'
+    - condition:
+        expression: $.message == 'Hello Subrata!!'
       score:
         passed: 10
         failed: 0
@@ -60,7 +64,24 @@
         - name: Accept
           value: application/json
   checks:
-    - condition: $.message == 'Hello There!!'
+    - condition:
+        expression: $.message == 'Hello There!!'
+      score:
+        passed: 10
+        failed: 0
+- id: TC4
+  name: Greetings GET Test with Executor
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /get/hello
+      method: GET
+      headers:
+        - name: Accept
+          value: application/json
+  checks:
+    - condition:
+        executor: com.wellsfargo.api.test.JsonPathConditionExecutor
       score:
         passed: 10
         failed: 0

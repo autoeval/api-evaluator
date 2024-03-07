@@ -1,14 +1,17 @@
 package com.wellsfargo.api.evaluator.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties
 public class Check {
-    private String condition;
+    private Condition condition;
     private Score score;
 
-    public String getCondition() {
+    public Condition getCondition() {
         return condition;
     }
 
-    public void setCondition(String condition) {
+    public void setCondition(Condition condition) {
         this.condition = condition;
     }
 

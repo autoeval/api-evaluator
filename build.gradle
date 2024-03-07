@@ -14,6 +14,7 @@ dependencies {
     implementation 'com.jayway.jsonpath:json-path:2.9.0'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1'
+    implementation 'com.octomix.josson:josson:1.4.6'
     implementation 'commons-lang:commons-lang:2.6'
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
