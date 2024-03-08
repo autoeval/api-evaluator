@@ -57,7 +57,7 @@ public class Main {
                     submissionPlaceholders.put("BASEPATH", removeSuffixIfExists(apiPingUrl, "/ping"));
                     List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders);
                     return testCaseScores.stream().map(testCaseScore -> {
-                        LOGGER.info("Team: '{}',TC Id: '{}', TC Name: '{}', Score: '{}'", testCaseScore.getSubmissionId(), testCaseScore.getTestCaseId(), testCaseScore.getTestCaseName(), testCaseScore.getTestCaseScore());
+                        LOGGER.info("Team: '{}',TC Id: '{}', TC Name: '{}', Score: '{}'", submission.getTeamName(), testCaseScore.getTestCaseId(), testCaseScore.getTestCaseName(), testCaseScore.getTestCaseScore());
                         testCaseScore.setSubmissionId(submission.getTeamName());
                         return testCaseScore;
                     }).collect(Collectors.toList());

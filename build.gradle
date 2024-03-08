@@ -30,7 +30,7 @@ test {
 
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': 'com.wellsfargo.api.Main'
+        attributes 'Main-Class': 'com.autoeval.api.Main'
     }
     archiveFileName = 'api-evaluator.jar'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
