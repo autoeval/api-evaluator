@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HackathonCSVReader {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HackathonCSVReader.class);
 
     protected List<HackathonBean> hackathonBeanList;
 
