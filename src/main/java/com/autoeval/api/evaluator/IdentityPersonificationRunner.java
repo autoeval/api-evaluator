@@ -33,9 +33,9 @@ public class IdentityPersonificationRunner {
 
         hackathonBeanList.forEach(hackathonBean -> {
             placeholders.put("BASEPATH", hackathonBean.getPingURL());
-            System.out.println(hackathonBean.getPingURL());
-            run(testCaseFilePath, placeholders);
+            run(testCaseFilePath, placeholders, hackathonBean);
         });
+
     }
 
 
@@ -44,7 +44,7 @@ public class IdentityPersonificationRunner {
         return hackathonCSVReader.readHackathonCSV(hackathonCSVFilePath);
     }
 
-    public static void run(String testCaseFilePath, Map<String, String> placeholders) {
+    public static void run(String testCaseFilePath, Map<String, String> placeholders,HackathonBean hackathonBean) {
         LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
         ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(ch.qos.logback.classic.Level.toLevel(loggingLevel));
@@ -54,6 +54,7 @@ public class IdentityPersonificationRunner {
         double totalScore = testCaseScores.stream().mapToDouble(TestCaseScore::getScore).sum();
         testCaseScores.forEach(testCaseScore -> LOGGER.info("TC Id: '{}', TC Name: '{}', Score: '{}'", testCaseScore.getId(), testCaseScore.getName(), testCaseScore.getScore()));
         LOGGER.info("Total Score = " + totalScore);
+        hackathonBean.setStep1Score(totalScore);
     }
 
 }
