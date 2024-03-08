@@ -27,9 +27,10 @@ public class Evaluator {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         final OkHttpClient client = new OkHttpClient().newBuilder().build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
-        testCases.forEach(testCase -> testCaseScores.add(executeTest(client, testCase)));
+        testCases.parallelStream().forEach(testCase -> testCaseScores.add(executeTest(client, testCase)));
         return testCaseScores;
     }
+
     private List<TestCase> parseTestCases(final String testCaseFile, Map<String, String> placeHolders) {
         try {
             File file = new File(testCaseFile);
@@ -45,6 +46,7 @@ public class Evaluator {
             return Collections.emptyList();
         }
     }
+
     private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase) {
         final DoubleAdder doubleAdder = new DoubleAdder();
         try {
@@ -53,30 +55,30 @@ public class Evaluator {
             final Request.Builder builder = new Request.Builder();
             request.getHeaders().forEach(header -> {
                 builder.addHeader(header.getName(), header.getValue());
-                if(header.getName().equalsIgnoreCase("Content-Type")) {
+                if (header.getName().equalsIgnoreCase("Content-Type")) {
                     bodyContentType.set(header.getValue());
                 }
             });
 
             RequestBody body;
-            if(!Objects.isNull(request.getMultipart())) {
+            if (!Objects.isNull(request.getMultipart())) {
                 MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-                if(request.getMultipart().getFiles() != null) {
+                if (request.getMultipart().getFiles() != null) {
                     request.getMultipart().getFiles().forEach(filePart -> multipartBodyBuilder.addFormDataPart(filePart.getParamName(), filePart.getPath(),
                             RequestBody.create(MediaType.parse(filePart.getContentType()),
                                     new File(filePart.getPath()))));
                 }
-                if(request.getMultipart().getFields() != null) {
+                if (request.getMultipart().getFields() != null) {
                     request.getMultipart().getFields().forEach(field -> {
                         multipartBodyBuilder.addFormDataPart(field.getName(), field.getValue());
                     });
                 }
                 body = multipartBodyBuilder.build();
-            } else if(!Objects.isNull(request.getBody())) {
+            } else if (!Objects.isNull(request.getBody())) {
                 body = RequestBody.create(request.getBody(), MediaType.parse(bodyContentType.get()));
-            } else if(!Objects.isNull(request.getForm())) {
+            } else if (!Objects.isNull(request.getForm())) {
                 FormBody.Builder formBuilder = new FormBody.Builder();
-                if(request.getForm().getFields() != null) {
+                if (request.getForm().getFields() != null) {
                     request.getForm().getFields().forEach(field -> {
                         formBuilder.addEncoded(field.getName(), field.getValue());
                     });
@@ -87,7 +89,7 @@ public class Evaluator {
             }
 
             final Request httpRequest = builder
-                    .url(testCase.getHttp().getBasePath().replace("/ping", request.getUri()))
+                    .url(testCase.getHttp().getBasePath().concat(request.getUri()))
                     .method(request.getMethod(), body)
                     .build();
             final Response response = client.newCall(httpRequest).execute();
@@ -96,43 +98,42 @@ public class Evaluator {
             testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             TestCaseScore score = new TestCaseScore();
-            score.setId(testCase.getId());
-            score.setName(testCase.getName());
-            score.setScore(doubleAdder.doubleValue());
+            score.setTestCaseId(testCase.getId());
+            score.setTestCaseName(testCase.getName());
+            score.setTestCaseScore(doubleAdder.doubleValue());
             return score;
         }
     }
 
     private double executeConditionAndScore(final Check check, final String responseText) {
-        if(Objects.isNull(check.getCondition())) {
+        if (Objects.isNull(check.getCondition())) {
             return check.getScore().getPassed();
-        } else if(Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
-            if(buildExecutor(check.getCondition().getExecutor()).apply(responseText)) {
+        } else if (Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
+            if (buildExecutor(check.getCondition().getExecutor()).apply(responseText)) {
                 return check.getScore().getPassed();
             } else {
                 return check.getScore().getFailed();
             }
-        } else if(!Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
-            if(check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
+        } else if (!Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
+            if (check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
                 final List<Object> jsonPathResult = computeJsonPath(responseText, check.getCondition().getExpression());
-                if(buildExecutor(check.getCondition().getExecutor()).apply(jsonPathResult)) {
+                if (buildExecutor(check.getCondition().getExecutor()).apply(jsonPathResult)) {
                     return check.getScore().getPassed();
                 } else {
                     return check.getScore().getFailed();
                 }
             } else {
                 final JsonNode node = computeJosson(responseText, check.getCondition().getExpression());
-                if(buildExecutor(check.getCondition().getExecutor()).apply(node)) {
+                if (buildExecutor(check.getCondition().getExecutor()).apply(node)) {
                     return check.getScore().getPassed();
                 } else {
                     return check.getScore().getFailed();
                 }
             }
-        } else if(!Objects.isNull(check.getCondition().getExpression()) && Objects.isNull(check.getCondition().getExecutor())) {
-            if(check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
+        } else if (!Objects.isNull(check.getCondition().getExpression()) && Objects.isNull(check.getCondition().getExecutor())) {
+            if (check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
                 final List<Object> jsonPathResult = computeJsonPath(responseText, check.getCondition().getExpression());
                 return calculateScoreForJsonPath(jsonPathResult, check.getScore());
             } else {
@@ -163,7 +164,7 @@ public class Evaluator {
     }
 
     private double calculateScoreForJsonPath(final List<Object> result, final Score score) {
-        if(result == null || result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             return score.getFailed();
         } else {
             return score.getPassed();
@@ -171,7 +172,7 @@ public class Evaluator {
     }
 
     private double calculateScoreForJosson(final JsonNode node, final Score score) {
-        if(node == null || node.isNull() || node.isEmpty()) {
+        if (node == null || node.isNull() || node.isEmpty()) {
             return score.getFailed();
         } else {
             return score.getPassed();
@@ -183,7 +184,8 @@ public class Evaluator {
             Class<?> cls = Class.forName(executorClass);
             return (ConditionExecutor) cls.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            return new ConditionExecutor() {};
+            return new ConditionExecutor() {
+            };
         }
     }
 }

@@ -81,7 +81,7 @@
           value: application/json
   checks:
     - condition:
-        executor: com.wellsfargo.api.test.JsonPathConditionExecutor
+        executor: com.autoeval.api.test.JsonPathConditionExecutor
       score:
         passed: 10
         failed: 0

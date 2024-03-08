@@ -13,14 +13,14 @@
       multipart:
         files:
           - param-name: file
-            path: ${TEST_IMAGE_DIRECTORY}/ai1.mp3
+            path: ${TEST_DATA_DIRECTORY}/ai1.mp3
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability > 0.8
+        expression: $.analysis.detectedVoice == false && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability > 0.8
       score:
         passed: 10
-        failed: 0
+        failed: -5
 - id: TC2
   name: Detect Isolated human voice
   http:
@@ -36,7 +36,7 @@
       multipart:
         files:
           - param-name: file
-            path: ${TEST_IMAGE_DIRECTORY}/human1.mp3
+            path: ${TEST_DATA_DIRECTORY}/human1.mp3
             content-type: application/octet-stream
   checks:
     - condition:

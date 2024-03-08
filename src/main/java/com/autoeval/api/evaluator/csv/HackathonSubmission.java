@@ -1,11 +1,7 @@
 package com.autoeval.api.evaluator.csv;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-
-public class HackathonBean {
+public class HackathonSubmission {
 
     private String teamName;
     private String gitURL;
@@ -41,7 +37,7 @@ public class HackathonBean {
         this.step1Comment = step1Comment;
     }
 
-    public HackathonBean (String teamName, String gitURL, String pingURL) {
+    public HackathonSubmission(String teamName, String gitURL, String pingURL) {
         this.teamName = teamName;
         this.gitURL = gitURL;
         this.pingURL = pingURL;

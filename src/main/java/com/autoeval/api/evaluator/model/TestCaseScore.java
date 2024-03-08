@@ -1,31 +1,40 @@
 package com.autoeval.api.evaluator.model;
 
 public class TestCaseScore {
-    private String id;
-    private String name;
-    private double score;
+    private String submissionId;
+    private String testCaseId;
+    private String testCaseName;
+    private double testCaseScore;
 
-    public String getId() {
-        return id;
+    public String getSubmissionId() {
+        return submissionId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSubmissionId(String submissionId) {
+        this.submissionId = submissionId;
     }
 
-    public String getName() {
-        return name;
+    public String getTestCaseId() {
+        return testCaseId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTestCaseId(String testCaseId) {
+        this.testCaseId = testCaseId;
     }
 
-    public double getScore() {
-        return score;
+    public String getTestCaseName() {
+        return testCaseName;
     }
 
-    public void setScore(double score) {
-        this.score = score;
+    public void setTestCaseName(String testCaseName) {
+        this.testCaseName = testCaseName;
+    }
+
+    public double getTestCaseScore() {
+        return testCaseScore;
+    }
+
+    public void setTestCaseScore(double testCaseScore) {
+        this.testCaseScore = testCaseScore;
     }
 }
