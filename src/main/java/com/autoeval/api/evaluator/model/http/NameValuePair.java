@@ -1,4 +1,4 @@
-package com.wellsfargo.api.evaluator.model.http;
+package com.autoeval.api.evaluator.model.http;
 
 public class NameValuePair {
     private String name;

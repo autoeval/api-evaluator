@@ -1,4 +1,4 @@
-package com.wellsfargo.api.evaluator.model;
+package com.autoeval.api.evaluator.model;
 
 public enum ExpressionType {
     JSON_PATH,

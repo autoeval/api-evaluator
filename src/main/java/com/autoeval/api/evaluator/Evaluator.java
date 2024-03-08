@@ -1,5 +1,7 @@
-package com.wellsfargo.api.evaluator;
+package com.autoeval.api.evaluator;
 
+import com.autoeval.api.evaluator.model.*;
+import com.autoeval.api.evaluator.model.http.HttpRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +9,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.octomix.josson.Josson;
-import com.wellsfargo.api.evaluator.model.*;
-import com.wellsfargo.api.evaluator.model.http.HttpRequest;
 import okhttp3.*;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.DoubleAdder;
@@ -88,7 +87,7 @@ public class Evaluator {
             }
 
             final Request httpRequest = builder
-                    .url(testCase.getHttp().getBasePath().concat(request.getUri()))
+                    .url(testCase.getHttp().getBasePath().replace("/ping", request.getUri()))
                     .method(request.getMethod(), body)
                     .build();
             final Response response = client.newCall(httpRequest).execute();

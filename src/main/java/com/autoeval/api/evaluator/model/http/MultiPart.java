@@ -1,4 +1,4 @@
-package com.wellsfargo.api.evaluator.model.http;
+package com.autoeval.api.evaluator.model.http;
 
 import java.util.List;
 
