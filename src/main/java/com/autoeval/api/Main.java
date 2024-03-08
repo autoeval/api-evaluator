@@ -1,11 +1,11 @@
-package com.wellsfargo.api;
+package com.autoeval.api;
 
 import ch.qos.logback.classic.LoggerContext;
+import com.autoeval.api.evaluator.Evaluator;
+import com.autoeval.api.evaluator.model.TestCaseScore;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.wellsfargo.api.evaluator.Evaluator;
-import com.wellsfargo.api.evaluator.model.TestCaseScore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +32,10 @@ public class Main {
     }
 
     private void run() {
+        run(testCaseFilePath, placeholders);
+    }
+
+    public void run(String testCaseFilePath, Map<String, String> placeholders) {
         LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
         ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(ch.qos.logback.classic.Level.toLevel(loggingLevel));

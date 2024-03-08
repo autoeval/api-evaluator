@@ -1,4 +1,4 @@
-package com.wellsfargo.api.evaluator.model;
+package com.autoeval.api.evaluator.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

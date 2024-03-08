@@ -1,4 +1,4 @@
-package com.wellsfargo.api.evaluator.model;
+package com.autoeval.api.evaluator.model;
 
 public class TestCaseScore {
     private String id;
