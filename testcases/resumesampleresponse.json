@@ -1,0 +1,24 @@
+{
+  "count": 8,
+  "metadata": {
+    "confidenceScore": 0.8
+  },
+  "results": [
+    {
+      "id": 12345,
+      "path": "resumeDataSet/12345.pdf",
+      "score": 0.8
+    },
+    {
+      "id": 45678,
+      "path": "resumeDataSet/45678.pdf",
+      "score": 0.75
+    },
+    {
+      "id": 45678,
+      "path": "resumeDataSet/45678.pdf",
+      "score": 0.75
+    }
+  ],
+  "status": "success"
+}
