@@ -1,8 +1,17 @@
 package com.autoeval.api.evaluator.model;
 
 public class Score {
+    private String calculator;
     private double passed;
     private double failed;
+
+    public String getCalculator() {
+        return calculator;
+    }
+
+    public void setCalculator(String calculator) {
+        this.calculator = calculator;
+    }
 
     public double getPassed() {
         return passed;

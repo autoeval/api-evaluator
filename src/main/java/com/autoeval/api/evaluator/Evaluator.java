@@ -10,6 +10,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.octomix.josson.Josson;
 import okhttp3.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class Evaluator {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         final OkHttpClient client = new OkHttpClient().newBuilder().build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
-        testCases.parallelStream().forEach(testCase -> testCaseScores.add(executeTest(client, testCase)));
+        testCases.stream().forEach(testCase -> testCaseScores.add(executeTest(client, testCase)));
         return testCaseScores;
     }
 
@@ -109,39 +110,39 @@ public class Evaluator {
 
     private double executeConditionAndScore(final Check check, final String responseText) {
         if (Objects.isNull(check.getCondition())) {
-            return check.getScore().getPassed();
+            return calculateScore(responseText, check.getScore(), true);
         } else if (Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
             if (buildExecutor(check.getCondition().getExecutor()).apply(responseText)) {
-                return check.getScore().getPassed();
+                return calculateScore(responseText, check.getScore(), true);
             } else {
-                return check.getScore().getFailed();
+                return calculateScore(responseText, check.getScore(), false);
             }
         } else if (!Objects.isNull(check.getCondition().getExpression()) && !Objects.isNull(check.getCondition().getExecutor())) {
             if (check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
                 final List<Object> jsonPathResult = computeJsonPath(responseText, check.getCondition().getExpression());
                 if (buildExecutor(check.getCondition().getExecutor()).apply(jsonPathResult)) {
-                    return check.getScore().getPassed();
+                    return calculateScore(responseText, check.getScore(), true);
                 } else {
-                    return check.getScore().getFailed();
+                    return calculateScore(responseText, check.getScore(), false);
                 }
             } else {
                 final JsonNode node = computeJosson(responseText, check.getCondition().getExpression());
                 if (buildExecutor(check.getCondition().getExecutor()).apply(node)) {
-                    return check.getScore().getPassed();
+                    return calculateScore(responseText, check.getScore(), true);
                 } else {
-                    return check.getScore().getFailed();
+                    return calculateScore(responseText, check.getScore(), false);
                 }
             }
         } else if (!Objects.isNull(check.getCondition().getExpression()) && Objects.isNull(check.getCondition().getExecutor())) {
             if (check.getCondition().getExpressionType().equals(ExpressionType.JSON_PATH)) {
                 final List<Object> jsonPathResult = computeJsonPath(responseText, check.getCondition().getExpression());
-                return calculateScoreForJsonPath(jsonPathResult, check.getScore());
+                return calculateScoreForJsonPath(responseText, jsonPathResult, check.getScore());
             } else {
                 final JsonNode node = computeJosson(responseText, check.getCondition().getExpression());
-                return calculateScoreForJosson(node, check.getScore());
+                return calculateScoreForJosson(responseText, node, check.getScore());
             }
         } else {
-            return check.getScore().getPassed();
+            return calculateScore(responseText, check.getScore(), true);
         }
     }
 
@@ -163,19 +164,37 @@ public class Evaluator {
         }
     }
 
-    private double calculateScoreForJsonPath(final List<Object> result, final Score score) {
+    private double calculateScoreForJsonPath(final String responseText, final List<Object> result, final Score score) {
+
         if (result == null || result.isEmpty()) {
-            return score.getFailed();
+            return calculateScore(responseText, score, false);
         } else {
-            return score.getPassed();
+            return calculateScore(responseText, score, true);
         }
     }
 
-    private double calculateScoreForJosson(final JsonNode node, final Score score) {
+    private double calculateScoreForJosson(final String responseText, final JsonNode node, final Score score) {
         if (node == null || node.isNull() || node.isEmpty()) {
-            return score.getFailed();
+            return calculateScore(responseText, score, false);
         } else {
-            return score.getPassed();
+            return calculateScore(responseText, score, true);
+        }
+    }
+
+    private double calculateScore(final String responseText, Score score, boolean isSuccess) {
+        if(StringUtils.isNotBlank(score.getCalculator())) {
+            ScoreCalculator calculator = buildScoreCalculator(score.getCalculator());
+            if(isSuccess) {
+                return calculator.calculatePassedScore(responseText);
+            } else {
+                return calculator.calculateFailedScore(responseText);
+            }
+        } else {
+            if(isSuccess) {
+                return score.getPassed();
+            } else {
+                return score.getFailed();
+            }
         }
     }
 
@@ -185,6 +204,16 @@ public class Evaluator {
             return (ConditionExecutor) cls.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             return new ConditionExecutor() {
+            };
+        }
+    }
+
+    private ScoreCalculator buildScoreCalculator(final String calculatorClass) {
+        try {
+            Class<?> cls = Class.forName(calculatorClass);
+            return (ScoreCalculator) cls.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            return new ScoreCalculator() {
             };
         }
     }

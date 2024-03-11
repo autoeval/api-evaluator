@@ -3,5 +3,5 @@ End to end test and score provided api
 
 # Sample command line
 ```shell
-java -jar api-evaluator.jar -csv /D://Hackathon_2024/workspace/api-evaluator/testcases/SampleSubmissionCSV.csv -pTEST_DATA_DIRECTORY=/D://Hackathon_2024 -tc /D://Hackathon_2024/workspace/api-evaluator/testcases/voice-personification-testcases.yaml -o /D://Hackathon_2024/workspace/api-evaluator/testcases/SampleSubmissionScore.csv
+java -jar api-evaluator.jar -csv /D://Hackathon_2024/workspace/api-evaluator/testcases/SampleSubmissionCSV.csv -pTEST_DATA_DIRECTORY=/D://Hackathon_2024/workspace/challenge-artifacts/identity-personification/dataset -tc /D://Hackathon_2024/workspace/api-evaluator/testcases/identity-personification.yaml -o /D://Hackathon_2024/workspace/api-evaluator/testcases/SampleSubmissionScore.csv
 ```

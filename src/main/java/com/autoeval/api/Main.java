@@ -12,6 +12,7 @@ import com.beust.jcommander.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,16 @@ public class Main {
 
         List<HackathonSubmission> submissions = new HackathonCSVReader().readHackathonCSV(csvFilePath);
 
-        submissions.parallelStream()
+        try {
+            File outFile = new File(outputPath);
+            if(outFile.exists()) {
+                outFile.delete();
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to delete output file {}", outputPath);
+        }
+
+        submissions.stream()
                 .map(submission -> {
                     Evaluator evaluator = new Evaluator();
                     String apiPingUrl = submission.getPingURL();

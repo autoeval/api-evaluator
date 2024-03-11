@@ -19,8 +19,7 @@
     - condition:
         expression: $.analysis.detectedVoice == false && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability > 0.8
       score:
-        passed: 10
-        failed: -5
+        calculator: com.autoeval.api.test.ResumeScoreCalculator
 - id: TC2
   name: Detect Isolated human voice
   http:

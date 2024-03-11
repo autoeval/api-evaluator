@@ -83,5 +83,4 @@
     - condition:
         executor: com.autoeval.api.test.JsonPathConditionExecutor
       score:
-        passed: 10
-        failed: 0
+        calculator: com.autoeval.api.test.ResumeScoreCalculator
