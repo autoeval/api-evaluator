@@ -99,6 +99,11 @@ public class Evaluator {
             testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
+            TestCaseScore score = new TestCaseScore();
+            score.setTestCaseId(testCase.getId());
+            score.setTestCaseName(testCase.getName());
+            score.setTestCaseScore(0.0);
+            return score;
         } finally {
             TestCaseScore score = new TestCaseScore();
             score.setTestCaseId(testCase.getId());

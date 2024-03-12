@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HackathonCSVWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(HackathonCSVWriter.class);
@@ -28,9 +29,10 @@ public class HackathonCSVWriter {
                     .withTrim();
         }
         final double totalScore = testCaseScores.stream().mapToDouble(TestCaseScore::getTestCaseScore).sum();
+        final String comment = testCaseScores.stream().map(testCaseScore -> testCaseScore.getTestCaseId().concat(" -> ").concat(String.valueOf(testCaseScore.getTestCaseScore()))).collect(Collectors.joining("\r\n"));
         try (final CSVPrinter printer = new CSVPrinter(new FileWriter(outputFile, file.exists()), csvFormat)) {
             String teamName = testCaseScores.stream().findAny().get().getSubmissionId();
-            printer.printRecord(teamName, totalScore, "Sample Comment");
+            printer.printRecord(teamName, totalScore, comment);
             LOGGER.info("Total Score for submission '{}' = {}", teamName, totalScore);
         } catch (IOException e) {
             e.printStackTrace();

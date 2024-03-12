@@ -19,7 +19,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
       score:
-        passed: 10
+        passed: 1
         failed: 0
 - id: TC2
   name: Detect Isolated human voice
@@ -42,7 +42,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
       score:
-        passed: 10
+        passed: 1
         failed: 0
 - id: TC3
   name: Distinguish emotional AI voice
@@ -65,7 +65,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.additionalInfo.emotionalTone == 'angry'
       score:
-        passed: 10
+        passed: 1
         failed: 0
 - id: TC4
   name: Distinguish emotional human voice
@@ -88,7 +88,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.additionalInfo.emotionalTone == 'angry'
       score:
-        passed: 10
+        passed: 1
         failed: 0
 - id: TC5
   name: Detect non-English AI voice
@@ -111,7 +111,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
       score:
-        passed: 5
+        passed: 0.5
         failed: 0
 - id: TC6
   name: Detect non-English human voice
@@ -134,7 +134,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
       score:
-        passed: 5
+        passed: 0.5
         failed: 0
 - id: TC7
   name: Detect AI voice with different accents
@@ -157,7 +157,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
       score:
-        passed: 5
+        passed: 0.5
         failed: 0
 - id: TC8
   name: Detect human voice with different accents
@@ -180,7 +180,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
       score:
-        passed: 5
+        passed: 0.5
         failed: 0
 - id: TC9
   name: Detect combination of AI/Human
@@ -203,7 +203,7 @@
     - condition:
         expression: $.analysis.detectedVoice == true && $.analysis.confidenceScore.humanProbability >= 0.4 && $.analysis.confidenceScore.humanProbability <= 0.6 && $.analysis.confidenceScore.aiProbability >= 0.4 && $.analysis.confidenceScore.aiProbability <= 0.6
       score:
-        passed: 5
+        passed: 1
         failed: 0
 - id: TC10
   name: Detect non voice audio
@@ -226,5 +226,51 @@
     - condition:
         expression: $.analysis.detectedVoice == false && $.analysis.confidenceScore.humanProbability == 0 && $.analysis.confidenceScore.aiProbability == 0
       score:
-        passed: 10
+        passed: 1
+        failed: 0
+- id: TC11
+  name: Detect AI voice with background noise
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: file
+            path: ${TEST_DATA_DIRECTORY}/noisy.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
+      score:
+        passed: 1
+        failed: 0
+- id: TC12
+  name: Detect human voice with background noise
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: file
+            path: ${TEST_DATA_DIRECTORY}/noisy-human.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
+      score:
+        passed: 1
         failed: 0
