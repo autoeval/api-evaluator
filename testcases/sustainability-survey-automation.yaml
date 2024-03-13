@@ -1,0 +1,165 @@
+- id: TC1
+  name: ESG Automation question1-success
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /questionnaire/generatefirstdraft/generateAnswer
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: >
+        {
+         "reportYear": "2024",
+         "InputQuestion": "Please indicate the number of women on your company's board of directors/ supervisory board and specify where this information is\r\navailable. If your company has a one-tier board structure, this figure includes: female executive directors, non-executive directors and independent\r\ndirectors. If your company has a two-tier board structure, this figure ONLY includes female independent directors and non-executive directors (this\r\nmeans that senior executives and employee representatives should not be included). Listed companies are required to provide links to public reports or\r\ncorporate websites. Non-Listed companies may provide internal documents and/or links to public reports or or corporate corporate websites. select the right option and provide a write in detail values: \r\n1. Number of female directors\r\n2. We do not report this information\r\n3. Not applicable. Please provide explanations in the comment box below.\r\n4. Not known"
+        }
+  checks:
+    - condition:
+        expression: $.questionnireSummary.documentReference == 'https://www.08.wellsfargomedia.com/assets/pdf/about/investor-relations/annual-reports/2023-proxy-statement.pdf'
+          && $.questionnireSummary.confidenceScores >= '0.8'
+      score:
+        passed: 5
+        failed: 0
+
+- id: TC2
+  name: ESG Automation question2-success
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /questionnaire/generatefirstdraft/generateAnswer
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: >
+        {
+          "reportYear": "2024",
+          "inputQuestion": "Give a general description and introduction to your organization."
+        }
+  checks:
+    - condition:
+        expression: $.questionnireSummary.documentReference == 'https://www.08.wellsfargomedia.com/assets/pdf/about/investor-relations/annual-reports/2023-annual-report.pdf'
+          && $.questionnireSummary.confidenceScores >= '0.8'
+      score:
+        passed: 20
+        failed: 0
+
+
+- id: TC3
+  name: ESG Automation question3-success
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /questionnaire/generatefirstdraft/generateAnswer
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: >
+        {
+            "reportYear": "2024",
+            "inputQuestion": "Have you received any external assurance in relation to your company's sustainability reporting? lf yes, then attach supporting evidence
+          indicating where the assurance statement is available in the public domain,
+          Choose from options below
+          1. Yes, we have received an assurance statement by an external assurance specialist (e.g., b7 accountants, accountants, certification certification bodies, specialist
+          consultancies)?
+              a. The assurance statement is based on a recognized international or national standard (e.g. AAIOOOAS, ISAE 3000).
+              b. The assurance statement contains a "declaration of independence" which specifies that the assurance provider has no conflict of interest in relation
+          to providing the assurance of environmental and / social data for the company which has been assured
+              c. The scope of the assurance statement clearly indicates that it covers environmental KPls. If only some KPis are assured, then it is clearly indicated
+          which data/KPls disclosed in the report have been assured.
+              d. The scope of the assurance statement clearly indicates that it covers social KPIs. If only some KPls are assured, then it is clearly indicated which
+          data/KPls disclosed in the report have been assured,
+              e. The assurance statement contains a conclusion, i.e. either reasonable assurance or limited assurance
+          2. No, we do not have any external assurance on our sustainability reporting.
+          3. Not applicable. Please provide explanations in the comment box below.
+          "
+        }
+  checks:
+    - condition:
+        expression: $.questionnireSummary.documentReference == 'https://www.08.wellsfargomedia.com/assets/pdf/about/corporateresponsibility/statement-greenhouse-gas-emissions.pdf'         
+          && $.questionnireSummary.confidenceScores >= '0.8'
+      score:
+        passed: 20
+        failed: 0
+
+- id: TC4
+  name: ESG Automation question4-failure
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /questionnaire/generatefirstdraft/generateAnswer
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: >
+        {
+          "reportYear": "2024",
+          "inputQuestion": "Please indicate the number of women on your company's board of directors/ supervisory board and specify where this information is\r\navailable. If your company has a one-tier board structure, this figure includes: female executive directors, non-executive directors and independent\r\ndirectors. If your company has a two-tier board structure, this figure ONLY includes female independent directors and non-executive directors (this\r\nmeans that senior executives and employee representatives should not be included). Listed companies are required to provide links to public reports or\r\ncorporate websites. Non-Listed companies may provide internal documents and/or links to public reports or or corporate corporate websites. select the right option and provide a write in detail values: \r\n1. Number of male directors\r\n2. We report robot information\r\n3. We work with animals.\r\n4. We work with kids"
+        }
+  checks:
+    - condition:
+        expression: $.questionnireSummary.response =='no data available'
+                  && $.questionnireSummary.confidenceScores >= '0.8'
+      score:
+        passed: 5
+        failed: 0
+
+- id: TC5
+  name: ESG Automation question5-failure
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /questionnaire/generatefirstdraft/generateAnswer
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: >
+        {
+          "reportYear": "2024",
+          "inputQuestion": "Give a general description and introduction to your maternal grand parents""
+        }
+  checks:
+    - condition:
+        expression: $.questionnireSummary.response =='no data available'
+          && $.questionnireSummary.confidenceScores >= '0.8'
+      score:
+        passed: 20
+        failed: 0
+
+- id: TC6
+  name: ESG Automation question6-failure
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /questionnaire/generatefirstdraft/generateAnswer
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: application/json
+      body: >
+        {
+          "reportYear": "2024",
+          "inputQuestion": "Have you received any external assurance in relation to your company's sustainability reporting? lf yes, then attach supporting evidence\r\nindicating where the assurance statement is available in the public domain,\r\nChoose from options below\r\n"
+        }
+  checks:
+    - condition:
+        expression: $.questionnireSummary.response =='incomplete question'
+                   && $.questionnireSummary.confidenceScores >= '0.8'
+      score:
+        passed: 20
+        failed: 0
