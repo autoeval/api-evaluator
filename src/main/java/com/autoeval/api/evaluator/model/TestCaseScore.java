@@ -1,17 +1,19 @@
 package com.autoeval.api.evaluator.model;
 
+import com.autoeval.api.evaluator.csv.HackathonSubmission;
+
 public class TestCaseScore {
-    private String submissionId;
+    private HackathonSubmission submission;
     private String testCaseId;
     private String testCaseName;
     private double testCaseScore;
 
-    public String getSubmissionId() {
-        return submissionId;
+    public HackathonSubmission getSubmission() {
+        return submission;
     }
 
-    public void setSubmissionId(String submissionId) {
-        this.submissionId = submissionId;
+    public void setSubmission(HackathonSubmission submission) {
+        this.submission = submission;
     }
 
     public String getTestCaseId() {

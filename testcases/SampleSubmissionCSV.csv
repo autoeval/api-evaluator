@@ -1,4 +1,0 @@
-TeamName,GitHubId,PingURL
-IP1,https://github.com/Hackathon2024-March/challenge-artifacts.git,http://localhost:8080/api/pass/ping
-IP2,https://github.com/Hackathon2024-March/challenge-artifacts.git,http://localhost:8080/api/fail/ping
-IP3,https://github.com/Hackathon2024-March/challenge-artifacts.git,http://localhost:8080/api/partial/ping

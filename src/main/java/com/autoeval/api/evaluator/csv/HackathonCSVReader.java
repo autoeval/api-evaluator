@@ -22,7 +22,15 @@ public class HackathonCSVReader {
             List<HackathonSubmission> hackathonSubmissions = new ArrayList<>();
             CSVParser csvParser = reader(csvFilePath);
             for (CSVRecord csvRecord : csvParser) {
-                HackathonSubmission hackathonSubmission = new HackathonSubmission(csvRecord.get("TeamName"), csvRecord.get("GitHubId"), csvRecord.get("PingURL"));
+                HackathonSubmission hackathonSubmission = new HackathonSubmission(csvRecord.get("TEAM_NAME"),
+                        csvRecord.get("GITHUB_REPO"),
+                        csvRecord.get("ETP_FLAG"),
+                        csvRecord.get("API_PING_URL"),
+                        Double.valueOf(csvRecord.get("STEP0_SCORE")),
+                        csvRecord.get("STEP0_COMMENTS"),
+                        0,
+                        ""
+                );
                 hackathonSubmissions.add(hackathonSubmission);
             }
             return hackathonSubmissions;

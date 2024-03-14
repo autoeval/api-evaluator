@@ -1,11 +1,14 @@
 package com.autoeval.api.evaluator;
 
+import com.autoeval.api.evaluator.csv.HackathonSubmission;
 import com.autoeval.api.evaluator.model.*;
 import com.autoeval.api.evaluator.model.http.HttpRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.octomix.josson.Josson;
@@ -23,12 +26,14 @@ import java.util.concurrent.atomic.DoubleAdder;
 
 public class Evaluator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Evaluator.class);
+    private final Gson gson = new GsonBuilder().create();
 
-    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders) {
+    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders, HackathonSubmission submission) {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
-        final OkHttpClient client = new OkHttpClient().newBuilder().build();
+        OkHttpClient.Builder clientBuilder = new OkHttpClient().newBuilder();
+        final OkHttpClient client = clientBuilder.build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
-        testCases.stream().forEach(testCase -> testCaseScores.add(executeTest(client, testCase)));
+        testCases.forEach(testCase -> testCaseScores.add(executeTest(client, testCase, submission)));
         return testCaseScores;
     }
 
@@ -48,9 +53,10 @@ public class Evaluator {
         }
     }
 
-    private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase) {
+    private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase, HackathonSubmission submission) {
         final DoubleAdder doubleAdder = new DoubleAdder();
         try {
+            LOGGER.info("Team Name: {}, Test Case: '{}', Request: '{}'", submission.getTeamName(), testCase.getId(), gson.toJson(testCase.getHttp()));
             HttpRequest request = testCase.getHttp().getRequest();
             AtomicReference<String> bodyContentType = new AtomicReference<>("application/json");
             final Request.Builder builder = new Request.Builder();
@@ -95,7 +101,7 @@ public class Evaluator {
                     .build();
             final Response response = client.newCall(httpRequest).execute();
             final String responseText = response.body().string();
-
+            LOGGER.info("Team Name: {}, Test Case: '{}', Response: '{}'", submission.getTeamName(), testCase.getId(), responseText);
             testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

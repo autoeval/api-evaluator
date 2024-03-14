@@ -1,6 +1,7 @@
 package com.autoeval.api;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
 import com.autoeval.api.evaluator.Evaluator;
 import com.autoeval.api.evaluator.csv.HackathonCSVReader;
 import com.autoeval.api.evaluator.csv.HackathonCSVWriter;
@@ -9,10 +10,13 @@ import com.autoeval.api.evaluator.model.TestCaseScore;
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +35,9 @@ public class Main {
     @Parameter(names = {"--out", "--output", "-o", "-O"}, description = "Path to output CSV file")
     private String outputPath = "";
 
+    @Parameter(names = {"--log-config-file", "-l", "-L"}, description = "Path to log config file")
+    private String logConfigFile = "";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
@@ -47,6 +54,16 @@ public class Main {
         ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(ch.qos.logback.classic.Level.toLevel(loggingLevel));
 
+        if(StringUtils.isNotBlank(logConfigFile)) {
+            try(InputStream configStream = new FileInputStream(logConfigFile)) {
+                JoranConfigurator configurator = new JoranConfigurator();
+                configurator.setContext(loggerContext);
+                configurator.doConfigure(configStream);
+            } catch (Exception ignored) {
+                LOGGER.warn("Not able to configure logger from config file");
+            }
+        }
+
         List<HackathonSubmission> submissions = new HackathonCSVReader().readHackathonCSV(csvFilePath);
 
         try {
@@ -62,14 +79,12 @@ public class Main {
                 .map(submission -> {
                     Evaluator evaluator = new Evaluator();
                     String apiPingUrl = submission.getPingURL();
-                    Map<String, String> submissionPlaceholders = new HashMap<>();
-                    submissionPlaceholders.putAll(placeholders);
+                    Map<String, String> submissionPlaceholders = new HashMap<>(placeholders);
                     submissionPlaceholders.put("BASEPATH", removeSuffixIfExists(apiPingUrl, "/ping"));
-                    List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders);
-                    return testCaseScores.stream().map(testCaseScore -> {
+                    List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders, submission);
+                    return testCaseScores.stream().peek(testCaseScore -> {
                         LOGGER.info("Team: '{}',TC Id: '{}', TC Name: '{}', Score: '{}'", submission.getTeamName(), testCaseScore.getTestCaseId(), testCaseScore.getTestCaseName(), testCaseScore.getTestCaseScore());
-                        testCaseScore.setSubmissionId(submission.getTeamName());
-                        return testCaseScore;
+                        testCaseScore.setSubmission(submission);
                     }).collect(Collectors.toList());
                 })
                 .forEach(testCaseScores -> HackathonCSVWriter.writeCsv(outputPath, testCaseScores));

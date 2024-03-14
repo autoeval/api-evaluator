@@ -1,0 +1,19 @@
+TEAM_NAME,GITHUB_REPO,ETP_FLAG,API_PING_URL,STEP0_SCORE,STEP0_COMMENTS
+zerobyte,https://github.com/Hackathon2024-March/zerobyte,Y,http://localhost:8080/api/pass/ping,0,"design_score = 0
+demo_score = 0
+playbook_score = 0
+test_results_score = 0
+code_score = 0
+api_score = 0"
+ai-avengers,https://github.com/Hackathon2024-March/zephyr,Y,http://localhost:8080/api/fail/ping,0,"design_score = 0
+demo_score = 0
+playbook_score = 0
+test_results_score = 0
+code_score = 0
+api_score = 0"
+hackstreetboys,https://github.com/Hackathon2024-March/zephyr,Y,http://localhost:8080/api/partial/ping,0,"design_score = 0
+demo_score = 0
+playbook_score = 0
+test_results_score = 0
+code_score = 0
+api_score = 0"

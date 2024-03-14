@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class HackathonCSVWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(HackathonCSVWriter.class);
-    private static final String[] HEADERS = { "TeamName", "Step1Score", "Step1Comment"};
+    private static final String[] HEADERS = { "TEAM_NAME", "GITHUB_REPO", "ETP_FLAG", "API_PING_URL", "STEP0_SCORE" ,"STEP0_COMMENTS", "STEP1_SCORE" ,"STEP1_COMMENTS"};
 
     public static void writeCsv(final String outputFile, final List<TestCaseScore> testCaseScores) {
 
@@ -30,12 +30,14 @@ public class HackathonCSVWriter {
         }
         final double totalScore = testCaseScores.stream().mapToDouble(TestCaseScore::getTestCaseScore).sum();
         final String comment = testCaseScores.stream().map(testCaseScore -> testCaseScore.getTestCaseId().concat(" -> ").concat(String.valueOf(testCaseScore.getTestCaseScore()))).collect(Collectors.joining("\r\n"));
+        final HackathonSubmission submission = testCaseScores.stream().findAny().get().getSubmission();
+        submission.setStep1Score(totalScore);
+        submission.setStep1Comment(comment);
         try (final CSVPrinter printer = new CSVPrinter(new FileWriter(outputFile, file.exists()), csvFormat)) {
-            String teamName = testCaseScores.stream().findAny().get().getSubmissionId();
-            printer.printRecord(teamName, totalScore, comment);
-            LOGGER.info("Total Score for submission '{}' = {}", teamName, totalScore);
+            printer.printRecord(submission.toArray());
+            LOGGER.info("Total Score for submission '{}' = {}", submission.getTeamName(), totalScore);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed writing record", e);
         }
     }
 }
