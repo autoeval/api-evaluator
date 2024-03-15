@@ -110,7 +110,11 @@ public class Evaluator {
             score.setTestCaseName(testCase.getName());
             score.setTestCaseScore(doubleAdder.doubleValue());
             if(techInfo) {
-                score.setMessage("SUCCESSFUL");
+                if(response.code()!= 200) {
+                    score.setMessage("ERROR: HTTP Status='".concat(String.valueOf(response.code())).concat("'"));
+                } else {
+                    score.setMessage("SUCCESSFUL");
+                }
                 score.setResponseTimeInMs(responseTimeInMs);
             }
         } catch (Exception e) {
