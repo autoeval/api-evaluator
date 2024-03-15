@@ -38,6 +38,9 @@ public class Main {
     @Parameter(names = {"--log-config-file", "-l", "-L"}, description = "Path to log config file")
     private String logConfigFile = "";
 
+    @Parameter(names = {"--tech-info", "--ti", "-ti", "--info", "-info"}, description = "Technical Info will be available")
+    private boolean techInfo = false;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
@@ -81,7 +84,7 @@ public class Main {
                     String apiPingUrl = submission.getPingURL();
                     Map<String, String> submissionPlaceholders = new HashMap<>(placeholders);
                     submissionPlaceholders.put("BASEPATH", removeSuffixIfExists(apiPingUrl, "/ping"));
-                    List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders, submission);
+                    List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders, submission, techInfo);
                     return testCaseScores.stream().peek(testCaseScore -> {
                         LOGGER.info("Team: '{}',TC Id: '{}', TC Name: '{}', Score: '{}'", submission.getTeamName(), testCaseScore.getTestCaseId(), testCaseScore.getTestCaseName(), testCaseScore.getTestCaseScore());
                         testCaseScore.setSubmission(submission);

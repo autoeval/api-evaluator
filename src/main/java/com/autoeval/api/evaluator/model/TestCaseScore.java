@@ -7,6 +7,9 @@ public class TestCaseScore {
     private String testCaseId;
     private String testCaseName;
     private double testCaseScore;
+    private String message;
+    private long responseTimeInMs;
+
 
     public HackathonSubmission getSubmission() {
         return submission;
@@ -38,5 +41,21 @@ public class TestCaseScore {
 
     public void setTestCaseScore(double testCaseScore) {
         this.testCaseScore = testCaseScore;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public long getResponseTimeInMs() {
+        return responseTimeInMs;
+    }
+
+    public void setResponseTimeInMs(long responseTimeInMs) {
+        this.responseTimeInMs = responseTimeInMs;
     }
 }

@@ -28,12 +28,12 @@ public class Evaluator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Evaluator.class);
     private final Gson gson = new GsonBuilder().create();
 
-    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders, HackathonSubmission submission) {
+    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders, HackathonSubmission submission, boolean techInfo) {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         OkHttpClient.Builder clientBuilder = new OkHttpClient().newBuilder();
         final OkHttpClient client = clientBuilder.build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
-        testCases.forEach(testCase -> testCaseScores.add(executeTest(client, testCase, submission)));
+        testCases.forEach(testCase -> testCaseScores.add(executeTest(client, testCase, submission, techInfo)));
         return testCaseScores;
     }
 
@@ -53,8 +53,10 @@ public class Evaluator {
         }
     }
 
-    private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase, HackathonSubmission submission) {
+    private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase, HackathonSubmission submission, boolean techInfo) {
+        TestCaseScore score = new TestCaseScore();
         final DoubleAdder doubleAdder = new DoubleAdder();
+        long responseTimeInMs = 0;
         try {
             LOGGER.info("Team Name: {}, Test Case: '{}', Request: '{}'", submission.getTeamName(), testCase.getId(), gson.toJson(testCase.getHttp()));
             HttpRequest request = testCase.getHttp().getRequest();
@@ -100,23 +102,28 @@ public class Evaluator {
                     .method(request.getMethod(), body)
                     .build();
             final Response response = client.newCall(httpRequest).execute();
+            responseTimeInMs = response.receivedResponseAtMillis() - response.sentRequestAtMillis();
             final String responseText = response.body().string();
-            LOGGER.info("Team Name: {}, Test Case: '{}', Response: '{}'", submission.getTeamName(), testCase.getId(), responseText);
+            LOGGER.info("Team Name: {}, Test Case: '{}', Response: '{}' took {} ms", submission.getTeamName(), testCase.getId(), responseText, responseTimeInMs);
             testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            TestCaseScore score = new TestCaseScore();
-            score.setTestCaseId(testCase.getId());
-            score.setTestCaseName(testCase.getName());
-            score.setTestCaseScore(0.0);
-            return score;
-        } finally {
-            TestCaseScore score = new TestCaseScore();
             score.setTestCaseId(testCase.getId());
             score.setTestCaseName(testCase.getName());
             score.setTestCaseScore(doubleAdder.doubleValue());
-            return score;
+            if(techInfo) {
+                score.setMessage("SUCCESSFUL");
+                score.setResponseTimeInMs(responseTimeInMs);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            score.setTestCaseId(testCase.getId());
+            score.setTestCaseName(testCase.getName());
+            score.setTestCaseScore(0.0);
+            if(techInfo) {
+                score.setMessage("ERROR: ".concat(e.getMessage()));
+                score.setResponseTimeInMs(responseTimeInMs);
+            }
         }
+        return score;
     }
 
     private double executeConditionAndScore(final Check check, final String responseText) {
