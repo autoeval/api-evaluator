@@ -1,0 +1,17 @@
+﻿TeamName,ChallengeName,IsETP,RepoLink,Sandbox,PingURL
+Concord,ESG related survey response automation,1,https://github.com/hackathon2024-march/Concord,GCP,https://search-storage-pdfs-python-r7qlljpeq-uc.a.run.app?searchQuery=/ping
+SanDiego,ESG related survey response automation,1,https://github.com/hackathon2024-march/SanDiego,GCP,https://github.com/hackathon2024-march/SanDiego /ping
+Scottsdale,Identity impersonation detection ,1,https://github.com/hackathon2024-march/scottsdale,Azure,https://identity-impersonation-2y.eastus2.inference.ml.azure.com/score/ping
+Team7,Identity impersonation detection ,0,https://github.com/hackathon2024-march/Team7,GCP,https://us-east1-wells-fargo-genai24-8307.cloudfunctions.net/ping
+TechArmy,Identity impersonation detection ,0,https://github.com/hackathon2024-march/techarmy,Azure,https://ping
+SanBruno,Identity impersonation detection ,1,https://github.com/hackathon2024-march/SanBruno,GCP,https://sanbrunotestcontainer-pp6aov3k7q-uc.a.run.app/upload-audio/ping
+IdStealers,Identity impersonation detection ,0,https://github.com/hackathon2024-march/IdStealers,GCP,https://us-central1-wellsfargo-genai24-8190.cloudfunctions.net/ping
+LosAngeles,Identity impersonation detection ,1,https://github.com/hackathon2024-march/losangeles,Azure,https://losangeles-identity-detection.azurewebsites.net/ping
+Mesa,Identity impersonation detection ,1,https://github.com/hackathon2024-march/mesa,Azure,https://github.com/hackathon2024-march/mesa/ping
+OTB-Thinker,Resume Best Match,0,https://github.com/hackathon2024-march/otb-thinker,Azure,
+ResumeSpotters,Resume Best Match,0,https://github.com/hackathon2024-march/resumespotters,Azure,https://resumespottersais.search.windows.net/ping
+DallasAITeam,Resume Best Match,0,https://github.com/hackathon2024-march/DallasAITeam,GCP,https://wellsfargo-genai24-8107.uc.r.appspot.com/ping
+CCSIND,Resume Best Match,0,https://github.com/hackathon2024-march/ccsind,Azure,
+WellsResumeHunter,Resume Best Match,0,https://github.com/hackathon2024-march/wellsresumehunter,Azure,http://localhost:4200/ping
+Tech_Fargo,Sustainability benchmarking automation,0,https://github.com/hackathon2024-march/Tech_Fargo,GCP,http:///ping
+CCGO,Sustainability benchmarking automation,0,https://github.com/hackathon2024-march/ccgo,Azure,https://github.com/Hackathon2024-March/ccgo/blob/main/artifacts/playbook/Hackathon_2024.ipynb/ping

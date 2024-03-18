@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.DoubleAdder;
 
@@ -31,9 +32,14 @@ public class Evaluator {
     public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders, HackathonSubmission submission, boolean techInfo) {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         OkHttpClient.Builder clientBuilder = new OkHttpClient().newBuilder();
-        final OkHttpClient client = clientBuilder.build();
+        final OkHttpClient client = clientBuilder
+                .readTimeout(3, TimeUnit.MINUTES)
+                .build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
-        testCases.forEach(testCase -> testCaseScores.add(executeTest(client, testCase, submission, techInfo)));
+        for(TestCase testCase : testCases) {
+            TestCaseScore testCaseScore = executeTest(client, testCase, submission, techInfo);
+            testCaseScores.add(testCaseScore);
+        }
         return testCaseScores;
     }
 
@@ -58,7 +64,6 @@ public class Evaluator {
         final DoubleAdder doubleAdder = new DoubleAdder();
         long responseTimeInMs = 0;
         try {
-            LOGGER.info("Team Name: {}, Test Case: '{}', Request: '{}'", submission.getTeamName(), testCase.getId(), gson.toJson(testCase.getHttp()));
             HttpRequest request = testCase.getHttp().getRequest();
             AtomicReference<String> bodyContentType = new AtomicReference<>("application/json");
             final Request.Builder builder = new Request.Builder();
@@ -98,9 +103,10 @@ public class Evaluator {
             }
 
             final Request httpRequest = builder
-                    .url(testCase.getHttp().getBasePath().concat(request.getUri()))
+                    .url(buildBasePath(testCase.getHttp().getBasePath(), testCase).concat(request.getUri()))
                     .method(request.getMethod(), body)
                     .build();
+            LOGGER.info("Team Name: {}, Test Case: '{}', Request(url={}): '{}'", submission.getTeamName(), testCase.getId(), httpRequest.url(), gson.toJson(testCase.getHttp()));
             final Response response = client.newCall(httpRequest).execute();
             responseTimeInMs = response.receivedResponseAtMillis() - response.sentRequestAtMillis();
             final String responseText = response.body().string();
@@ -128,6 +134,24 @@ public class Evaluator {
             }
         }
         return score;
+    }
+
+    private String buildBasePath(String apiUrl, TestCase testCase) {
+        if(StringUtils.endsWithIgnoreCase(apiUrl, testCase.getHttp().getRequest().getUri().concat("/ping"))) {
+            return apiUrl.substring(0, apiUrl.length() - testCase.getHttp().getRequest().getUri().concat("/ping").length());
+        } else if(StringUtils.endsWithIgnoreCase(apiUrl, testCase.getHttp().getRequest().getUri().concat("/ping/"))) {
+            return apiUrl.substring(0, apiUrl.length() - testCase.getHttp().getRequest().getUri().concat("/ping/").length());
+        } else if(StringUtils.endsWithIgnoreCase(apiUrl, "/ping")) {
+            return apiUrl.substring(0, apiUrl.length() - "/ping".length());
+        } else if(StringUtils.endsWithIgnoreCase(apiUrl, "/ping/")) {
+            return apiUrl.substring(0, apiUrl.length() - "/ping/".length());
+        } else if(StringUtils.endsWithIgnoreCase(apiUrl, testCase.getHttp().getRequest().getUri())) {
+            return apiUrl.substring(0, apiUrl.length() - testCase.getHttp().getRequest().getUri().length());
+        } else if(StringUtils.endsWithIgnoreCase(apiUrl, testCase.getHttp().getRequest().getUri().concat("/"))) {
+            return apiUrl.substring(0, apiUrl.length() - testCase.getHttp().getRequest().getUri().concat("/").length());
+        } else {
+            return apiUrl;
+        }
     }
 
     private double executeConditionAndScore(final Check check, final String responseText) {

@@ -78,12 +78,12 @@ public class Main {
             LOGGER.warn("Failed to delete output file {}", outputPath);
         }
 
+        final Evaluator evaluator = new Evaluator();
         submissions.stream()
                 .map(submission -> {
-                    Evaluator evaluator = new Evaluator();
                     String apiPingUrl = submission.getPingURL();
                     Map<String, String> submissionPlaceholders = new HashMap<>(placeholders);
-                    submissionPlaceholders.put("BASEPATH", removeSuffixIfExists(apiPingUrl, "/ping"));
+                    submissionPlaceholders.put("BASEPATH", apiPingUrl);
                     List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders, submission, techInfo);
                     return testCaseScores.stream().peek(testCaseScore -> {
                         LOGGER.info("Team: '{}',TC Id: '{}', TC Name: '{}', Score: '{}'", submission.getTeamName(), testCaseScore.getTestCaseId(), testCaseScore.getTestCaseName(), testCaseScore.getTestCaseScore());
@@ -93,9 +93,4 @@ public class Main {
                 .forEach(testCaseScores -> HackathonCSVWriter.writeCsv(outputPath, testCaseScores));
     }
 
-    private String removeSuffixIfExists(String value, String suffix) {
-        return value.endsWith(suffix)
-                ? value.substring(0, value.length() - suffix.length())
-                : value;
-    }
 }

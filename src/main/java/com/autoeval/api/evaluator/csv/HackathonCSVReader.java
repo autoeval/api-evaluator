@@ -3,6 +3,7 @@ package com.autoeval.api.evaluator.csv;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,16 +23,19 @@ public class HackathonCSVReader {
             List<HackathonSubmission> hackathonSubmissions = new ArrayList<>();
             CSVParser csvParser = reader(csvFilePath);
             for (CSVRecord csvRecord : csvParser) {
-                HackathonSubmission hackathonSubmission = new HackathonSubmission(csvRecord.get("TEAM_NAME"),
-                        csvRecord.get("GITHUB_REPO"),
-                        csvRecord.get("ETP_FLAG"),
-                        csvRecord.get("API_PING_URL"),
-                        Double.valueOf(csvRecord.get("STEP0_SCORE")),
-                        csvRecord.get("STEP0_COMMENTS"),
-                        0,
-                        ""
-                );
-                hackathonSubmissions.add(hackathonSubmission);
+                String challengeName = StringUtils.trim(csvRecord.get("ChallengeName"));
+                if("Identity impersonation detection".equalsIgnoreCase(challengeName)) {
+                    HackathonSubmission hackathonSubmission = new HackathonSubmission(csvRecord.get("TeamName"),
+                            csvRecord.get("RepoLink"),
+                            csvRecord.get("IsETP"),
+                            csvRecord.get("pingURL"),
+                            0,
+                            "",
+                            0,
+                            ""
+                    );
+                    hackathonSubmissions.add(hackathonSubmission);
+                }
             }
             return hackathonSubmissions;
         } catch ( Exception e) {

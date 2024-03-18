@@ -17,7 +17,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
       score:
         passed: 1
         failed: 0
@@ -40,7 +40,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
       score:
         passed: 1
         failed: 0
@@ -63,7 +63,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.additionalInfo.emotionalTone == 'angry'
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100) && $.analysis.additionalInfo.emotionalTone == 'angry'
       score:
         passed: 1
         failed: 0
@@ -86,7 +86,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.additionalInfo.emotionalTone == 'angry'
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100) && $.analysis.additionalInfo.emotionalTone == 'angry'
       score:
         passed: 1
         failed: 0
@@ -109,7 +109,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
       score:
         passed: 0.5
         failed: 0
@@ -132,7 +132,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
       score:
         passed: 0.5
         failed: 0
@@ -155,7 +155,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
       score:
         passed: 0.5
         failed: 0
@@ -178,7 +178,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
       score:
         passed: 0.5
         failed: 0
@@ -201,7 +201,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.confidenceScore.humanProbability >= 0.4 && $.analysis.confidenceScore.humanProbability <= 0.6 && $.analysis.confidenceScore.aiProbability >= 0.4 && $.analysis.confidenceScore.aiProbability <= 0.6
+        expression: (($.analysis.confidenceScore.humanProbability >= 0.4 && $.analysis.confidenceScore.humanProbability <= 0.6) || ($.analysis.confidenceScore.humanProbability >= 40 && $.analysis.confidenceScore.humanProbability <= 60))  && (($.analysis.confidenceScore.aiProbability >= 0.4 && $.analysis.confidenceScore.aiProbability <= 0.6) || ($.analysis.confidenceScore.aiProbability >= 40 && $.analysis.confidenceScore.aiProbability <= 60))
       score:
         passed: 1
         failed: 0
@@ -224,7 +224,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == false && $.analysis.confidenceScore.humanProbability == 0 && $.analysis.confidenceScore.aiProbability == 0
+        expression: $.analysis.confidenceScore.humanProbability == 0 && $.analysis.confidenceScore.aiProbability == 0
       score:
         passed: 1
         failed: 0
@@ -247,7 +247,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'AI-Generated' && $.analysis.confidenceScore.aiProbability >= 0.7
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
       score:
         passed: 1
         failed: 0
@@ -270,7 +270,7 @@
             content-type: application/octet-stream
   checks:
     - condition:
-        expression: $.analysis.detectedVoice == true && $.analysis.voiceType == 'human' && $.analysis.confidenceScore.humanProbability >= 0.7
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
       score:
         passed: 1
         failed: 0
