@@ -1,0 +1,224 @@
+- id: TC1
+  name: Sustainability Benchmarking
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /esg/benchmark/upload/Nordson
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: documentUpload
+            path: ${TEST_DATA_DIRECTORY}/NordsonESGReport.pdf
+            content-type: application/pdf
+  checks:
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: MSCISustainalytics
+        primaryValue: A
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorSecondary
+        element: MSCISustainalytics
+        keywords: ['24.9']
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'NetZeroTarget'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        keywords: ['2050']
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorSecondary
+        element: NetZeroTarget
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'InterimEmissionsReductionTarget'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression:  $.esgResponse[0].benchmarkDetails
+        keywords: ['50%','2030']
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorSecondary
+        element: 'InterimEmissionsReductionTarget'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'RenewableElectricityTarget'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        keywords: ['70%','2050']
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorSecondary
+        element: 'RenewableElectricityTarget'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'CircularityStratergy'
+        primaryValue: 'No'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'DE&ITarget'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'HealthAndSafetyTarget'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'SupplyAuditTarget'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'GRI'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'SASB'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'TCFD'
+        primaryValue: 'Yes'
+      score:
+        passed: 4.375
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'Assurance'
+        primaryValue: 'No'
+      score:
+        passed: 4.375
+        failed: 0
+- id: TC2
+  name: Sustainability Benchmarking
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /esg/benchmark/upload/Nordson
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: documentUpload
+            path: ${TEST_DATA_DIRECTORY}/NordsonESGReport.pdf
+            content-type: application/pdf
+  checks:
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'SBTi'
+        primaryValue: 'No'
+      score:
+        passed: 5
+        failed: 0
+    - condition:
+        expression: $.esgResponse[0].benchmarkDetails
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPrimary
+        element: 'CDP'
+        primaryValue: 'D'
+      score:
+        passed: 5
+        failed: 0
+- id: TC3
+  name: Sustainability Benchmarking PDF Report
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /esg/benchmark/pdf-report/Nordson
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: documentUpload
+            path: ${TEST_DATA_DIRECTORY}/NordsonESGReport.pdf
+            content-type: application/pdf
+  checks:
+    - condition:
+        expression: $.
+        expression-type: JOSSON
+        executor: com.autoeval.api.evaluator.model.SBConditionExecutorPDF
+      score:
+        passed: 5
+        failed: 0    
+  
