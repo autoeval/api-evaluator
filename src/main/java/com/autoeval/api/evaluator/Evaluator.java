@@ -33,7 +33,8 @@ public class Evaluator {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         OkHttpClient.Builder clientBuilder = new OkHttpClient().newBuilder();
         final OkHttpClient client = clientBuilder
-                .readTimeout(3, TimeUnit.MINUTES)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.MINUTES)
                 .build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
         for(TestCase testCase : testCases) {
