@@ -1,22 +1,27 @@
 package com.autoeval.api.evaluator.model;
 
-import com.autoeval.api.evaluator.csv.HackathonSubmission;
-
 public class TestCaseScore {
-    private HackathonSubmission submission;
+    private String submissionId;
     private String testCaseId;
     private String testCaseName;
     private double testCaseScore;
-    private String message;
-    private long responseTimeInMs;
+    private String api_response;
+    private String pdf_content;
 
+    public String getApi_response() {
+		return api_response;
+	}
 
-    public HackathonSubmission getSubmission() {
-        return submission;
+	public void setApi_response(String api_response) {
+		this.api_response = api_response;
+	}
+
+	public String getSubmissionId() {
+        return submissionId;
     }
 
-    public void setSubmission(HackathonSubmission submission) {
-        this.submission = submission;
+    public void setSubmissionId(String submissionId) {
+        this.submissionId = submissionId;
     }
 
     public String getTestCaseId() {
@@ -43,19 +48,11 @@ public class TestCaseScore {
         this.testCaseScore = testCaseScore;
     }
 
-    public String getMessage() {
-        return message;
-    }
+	public String getPdf_content() {
+		return pdf_content;
+	}
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public long getResponseTimeInMs() {
-        return responseTimeInMs;
-    }
-
-    public void setResponseTimeInMs(long responseTimeInMs) {
-        this.responseTimeInMs = responseTimeInMs;
-    }
+	public void setPdf_content(String pdf_content2) {
+		this.pdf_content = pdf_content2;
+	}
 }

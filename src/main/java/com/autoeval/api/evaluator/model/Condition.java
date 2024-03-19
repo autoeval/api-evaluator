@@ -9,6 +9,11 @@ public class Condition {
     @JsonProperty("expression-type")
     private ExpressionType expressionType = ExpressionType.JSON_PATH;
     private String executor;
+    @JsonProperty("keywords")
+    private String[] labels;
+    
+    private String element;
+    private String primaryValue;
 
     public String getExpression() {
         return expression;
@@ -33,4 +38,28 @@ public class Condition {
     public void setExecutor(String executor) {
         this.executor = executor;
     }
+
+	public String[] getLabels() {
+		return labels;
+	}
+
+	public void setLabels(String[] labels) {
+		this.labels = labels;
+	}
+
+	public String getPrimaryValue() {
+		return primaryValue;
+	}
+
+	public void setPrimaryValue(String primaryValue) {
+		this.primaryValue = primaryValue;
+	}
+
+	public String getElement() {
+		return element;
+	}
+
+	public void setElement(String element) {
+		this.element = element;
+	}
 }
