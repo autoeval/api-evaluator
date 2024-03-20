@@ -9,18 +9,26 @@ public class HackathonSubmission {
     private String pingURL;
     private double step0Score;
     private String step0Comment;
+    private String testCaseId;
     private double step1Score;
     private String step1Comment;
+    private int apiResponseCode;
+    private String requestBody;
+    private String responseBody;
 
-    public HackathonSubmission(String teamName, String gitURL, String etpFlag, String pingURL, double step0Score, String step0Comment, double step1Score, String step1Comment) {
+    public HackathonSubmission(String teamName, String gitURL, String etpFlag, String pingURL, double step0Score, String step0Comment, String testCaseId, double step1Score, String step1Comment, int apiResponseCode, String requestBody, String responseBody) {
         this.teamName = teamName;
         this.gitURL = gitURL;
         this.etpFlag = etpFlag;
         this.pingURL = pingURL;
         this.step0Score = step0Score;
         this.step0Comment = step0Comment;
+        this.testCaseId = testCaseId;
         this.step1Score = step1Score;
         this.step1Comment = step1Comment;
+        this.apiResponseCode = apiResponseCode;
+        this.requestBody = requestBody;
+        this.responseBody = responseBody;
     }
 
     public String getTeamName() {
@@ -71,6 +79,14 @@ public class HackathonSubmission {
         this.step0Comment = step0Comment;
     }
 
+    public String getTestCaseId() {
+        return testCaseId;
+    }
+
+    public void setTestCaseId(String testCaseId) {
+        this.testCaseId = testCaseId;
+    }
+
     public double getStep1Score() {
         return step1Score;
     }
@@ -87,7 +103,35 @@ public class HackathonSubmission {
         this.step1Comment = step1Comment;
     }
 
-    public Object[] toArray() {
-        return new Object[] {teamName, gitURL, etpFlag, pingURL, step0Score, step0Comment, step1Score, step1Comment};
+    public int getApiResponseCode() {
+        return apiResponseCode;
+    }
+
+    public void setApiResponseCode(int apiResponseCode) {
+        this.apiResponseCode = apiResponseCode;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public void setRequestBody(String requestBody) {
+        this.requestBody = requestBody;
+    }
+
+    public String getResponseBody() {
+        return responseBody;
+    }
+
+    public void setResponseBody(String responseBody) {
+        this.responseBody = responseBody;
+    }
+
+    public Object[] toArray(boolean full) {
+        if(!full) {
+            return new Object[] {teamName, gitURL, etpFlag, pingURL, step0Score, step0Comment, step1Score, step1Comment};
+        } else {
+            return new Object[] {teamName, gitURL, etpFlag, pingURL, step0Score, step0Comment, testCaseId, step1Score, step1Comment, apiResponseCode, requestBody, responseBody};
+        }
     }
 }

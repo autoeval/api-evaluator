@@ -31,7 +31,11 @@ public class HackathonCSVReader {
                             csvRecord.get("pingURL"),
                             0,
                             "",
+                            "",
                             0,
+                            "",
+                            0,
+                            "",
                             ""
                     );
                     hackathonSubmissions.add(hackathonSubmission);

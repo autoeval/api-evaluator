@@ -9,6 +9,9 @@ public class TestCaseScore {
     private double testCaseScore;
     private String message;
     private long responseTimeInMs;
+    private int apiResponseCode;
+    private String requestBody;
+    private String responseBody;
 
 
     public HackathonSubmission getSubmission() {
@@ -57,5 +60,29 @@ public class TestCaseScore {
 
     public void setResponseTimeInMs(long responseTimeInMs) {
         this.responseTimeInMs = responseTimeInMs;
+    }
+
+    public int getApiResponseCode() {
+        return apiResponseCode;
+    }
+
+    public void setApiResponseCode(int apiResponseCode) {
+        this.apiResponseCode = apiResponseCode;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public void setRequestBody(String requestBody) {
+        this.requestBody = requestBody;
+    }
+
+    public String getResponseBody() {
+        return responseBody;
+    }
+
+    public void setResponseBody(String responseBody) {
+        this.responseBody = responseBody;
     }
 }

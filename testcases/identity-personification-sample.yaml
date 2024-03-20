@@ -1,0 +1,276 @@
+- id: TC1
+  name: Detect Isolated AI voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/AI-GEN-TEST-1.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
+      score:
+        passed: 1
+        failed: 0
+- id: TC2
+  name: Detect Isolated human voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/human_voice_Script1.mp3
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
+      score:
+        passed: 1
+        failed: 0
+- id: TC3
+  name: Distinguish emotional AI voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/ai-gen-furious.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100) && $.analysis.additionalInfo.emotionalTone == 'angry'
+      score:
+        passed: 1
+        failed: 0
+- id: TC4
+  name: Distinguish emotional human voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/human-angry.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100) && $.analysis.additionalInfo.emotionalTone == 'angry'
+      score:
+        passed: 1
+        failed: 0
+- id: TC5
+  name: Detect non-English AI voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/ai-geN-SPANISH-TEST3.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
+      score:
+        passed: 0.5
+        failed: 0
+- id: TC6
+  name: Detect non-English human voice
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/human-spanish.mp3
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
+      score:
+        passed: 0.5
+        failed: 0
+- id: TC7
+  name: Detect AI voice with different accents
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/AI-GEN-ACCENT-SPANISH-TEST-2.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
+      score:
+        passed: 0.5
+        failed: 0
+- id: TC8
+  name: Detect human voice with different accents
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/3.mp3
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
+      score:
+        passed: 0.5
+        failed: 0
+- id: TC9
+  name: Detect combination of AI/Human
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/combo.mp3
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: (($.analysis.confidenceScore.humanProbability >= 0.4 && $.analysis.confidenceScore.humanProbability <= 0.6) || ($.analysis.confidenceScore.humanProbability >= 40 && $.analysis.confidenceScore.humanProbability <= 60))  && (($.analysis.confidenceScore.aiProbability >= 0.4 && $.analysis.confidenceScore.aiProbability <= 0.6) || ($.analysis.confidenceScore.aiProbability >= 40 && $.analysis.confidenceScore.aiProbability <= 60))
+      score:
+        passed: 1
+        failed: 0
+- id: TC10
+  name: Detect non voice audio
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/music.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: $.analysis.confidenceScore.humanProbability == 0 && $.analysis.confidenceScore.aiProbability == 0
+      score:
+        passed: 1
+        failed: 0
+- id: TC11
+  name: Detect AI voice with background noise
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/noisy.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.aiProbability >= 0.7 && $.analysis.confidenceScore.aiProbability <= 1) || ($.analysis.confidenceScore.aiProbability >= 70 && $.analysis.confidenceScore.aiProbability <= 100)
+      score:
+        passed: 1
+        failed: 0
+- id: TC12
+  name: Detect human voice with background noise
+  http:
+    base-path: ${BASEPATH}
+    request:
+      uri: /voice/analyze
+      method: POST
+      headers:
+        - name: Accept
+          value: application/json
+        - name: Content-Type
+          value: multipart/form-data
+      multipart:
+        files:
+          - param-name: sample
+            path: ${TEST_DATA_DIRECTORY}/noisy-human.wav
+            content-type: application/octet-stream
+  checks:
+    - condition:
+        expression: ($.analysis.confidenceScore.humanProbability >= 0.7 && $.analysis.confidenceScore.humanProbability <= 1) || ($.analysis.confidenceScore.humanProbability >= 70 && $.analysis.confidenceScore.humanProbability <= 100)
+      score:
+        passed: 1
+        failed: 0

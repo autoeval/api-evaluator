@@ -41,6 +41,15 @@ public class Main {
     @Parameter(names = {"--tech-info", "--ti", "-ti", "--info", "-info"}, description = "Technical Info will be available")
     private boolean techInfo = false;
 
+    @Parameter(names = {"--request"}, description = "Output HTTP Request JSON")
+    private boolean request = false;
+
+    @Parameter(names = {"--response"}, description = "Output HTTP Request JSON")
+    private boolean response = false;
+
+    @Parameter(names = {"--fullpath", "--full", "-fp", "-FP"}, description = "Path to full output CSV file")
+    private String fullOutputPath = "";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
@@ -78,19 +87,33 @@ public class Main {
             LOGGER.warn("Failed to delete output file {}", outputPath);
         }
 
+        try {
+            File outFile = new File(fullOutputPath);
+            if(outFile.exists()) {
+                outFile.delete();
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to delete output file {}", fullOutputPath);
+        }
+
         final Evaluator evaluator = new Evaluator();
         submissions.stream()
                 .map(submission -> {
                     String apiPingUrl = submission.getPingURL();
                     Map<String, String> submissionPlaceholders = new HashMap<>(placeholders);
                     submissionPlaceholders.put("BASEPATH", apiPingUrl);
-                    List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders, submission, techInfo);
+                    List<TestCaseScore> testCaseScores = evaluator.evaluate(testCaseFilePath, submissionPlaceholders, submission, techInfo, request, response);
                     return testCaseScores.stream().peek(testCaseScore -> {
                         LOGGER.info("Team: '{}',TC Id: '{}', TC Name: '{}', Score: '{}'", submission.getTeamName(), testCaseScore.getTestCaseId(), testCaseScore.getTestCaseName(), testCaseScore.getTestCaseScore());
                         testCaseScore.setSubmission(submission);
                     }).collect(Collectors.toList());
                 })
-                .forEach(testCaseScores -> HackathonCSVWriter.writeCsv(outputPath, testCaseScores));
+                .forEach(testCaseScores -> {
+                    HackathonCSVWriter.writeCsv(outputPath, testCaseScores);
+                    if(StringUtils.isNotBlank(fullOutputPath)) {
+                        HackathonCSVWriter.writeFullCsv(fullOutputPath, testCaseScores);
+                    }
+                });
     }
 
 }

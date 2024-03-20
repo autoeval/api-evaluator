@@ -2,6 +2,7 @@ package com.autoeval.api.evaluator;
 
 import com.autoeval.api.evaluator.csv.HackathonSubmission;
 import com.autoeval.api.evaluator.model.*;
+import com.autoeval.api.evaluator.model.http.Http;
 import com.autoeval.api.evaluator.model.http.HttpRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +30,7 @@ public class Evaluator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Evaluator.class);
     private final Gson gson = new GsonBuilder().create();
 
-    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders, HackathonSubmission submission, boolean techInfo) {
+    public List<TestCaseScore> evaluate(final String testCaseFile, Map<String, String> placeHolders, HackathonSubmission submission, boolean techInfo, boolean request, boolean response) {
         List<TestCase> testCases = parseTestCases(testCaseFile, placeHolders);
         OkHttpClient.Builder clientBuilder = new OkHttpClient().newBuilder();
         final OkHttpClient client = clientBuilder
@@ -37,10 +38,7 @@ public class Evaluator {
                 .readTimeout(5, TimeUnit.MINUTES)
                 .build();
         final List<TestCaseScore> testCaseScores = new ArrayList<>();
-        for(TestCase testCase : testCases) {
-            TestCaseScore testCaseScore = executeTest(client, testCase, submission, techInfo);
-            testCaseScores.add(testCaseScore);
-        }
+        testCases.stream().forEach(testCase -> testCaseScores.add(executeTest(client, testCase, submission, techInfo, request, response)));
         return testCaseScores;
     }
 
@@ -60,7 +58,7 @@ public class Evaluator {
         }
     }
 
-    private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase, HackathonSubmission submission, boolean techInfo) {
+    private TestCaseScore executeTest(final OkHttpClient client, final TestCase testCase, HackathonSubmission submission, boolean techInfo, boolean requestFlag, boolean responseFlag) {
         TestCaseScore score = new TestCaseScore();
         final DoubleAdder doubleAdder = new DoubleAdder();
         long responseTimeInMs = 0;
@@ -103,14 +101,27 @@ public class Evaluator {
                 body = null;
             }
 
+            String finalUrl = buildBasePath(testCase.getHttp().getBasePath(), testCase).concat(request.getUri());
             final Request httpRequest = builder
-                    .url(buildBasePath(testCase.getHttp().getBasePath(), testCase).concat(request.getUri()))
+                    .url(finalUrl)
                     .method(request.getMethod(), body)
                     .build();
-            LOGGER.info("Team Name: {}, Test Case: '{}', Request(url={}): '{}'", submission.getTeamName(), testCase.getId(), httpRequest.url(), gson.toJson(testCase.getHttp()));
+            final Http http = testCase.getHttp();
+            final HttpRequest req = http.getRequest();
+            req.setUri(finalUrl);
+            http.setRequest(req);
+            final String reqestBody = gson.toJson(http);
+            if(requestFlag) {
+                score.setRequestBody(reqestBody);
+            }
+            LOGGER.info("Team Name: {}, Test Case: '{}', Request(url={}): '{}'", submission.getTeamName(), testCase.getId(), httpRequest.url(), reqestBody);
             final Response response = client.newCall(httpRequest).execute();
             responseTimeInMs = response.receivedResponseAtMillis() - response.sentRequestAtMillis();
             final String responseText = response.body().string();
+            if(responseFlag) {
+                score.setApiResponseCode(response.code());
+                score.setResponseBody(responseText);
+            }
             LOGGER.info("Team Name: {}, Test Case: '{}', Response: '{}' took {} ms", submission.getTeamName(), testCase.getId(), responseText, responseTimeInMs);
             testCase.getChecks().forEach(check -> doubleAdder.add(executeConditionAndScore(check, responseText)));
             score.setTestCaseId(testCase.getId());
